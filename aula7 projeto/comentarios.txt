@@ -1,0 +1,385 @@
+vinicius-almeida@andresavedrasenaioutlook.onmicrosoft.com
+ss atual: Viniciusalmeida123
+
+
+vamos rodar projeto aula 7 ,e fazer testes.
+
+-------------------------------------
+De inicio vamos logar no terminal 
+
+com az account show. - verifica contas logadas.
+
+az logout - desloga da conta anterior.
+
+az login az login --use-device-code - loga na sua conta.
+
+acesse o login e cooque o codigo de autenticacao.
+clieque na subscrition conforme o numero de referencia.
+
+E o subscription id copie para mudar no iac.tf
+------------------------------------
+
+Nao se esqueça que o terraform , salva estado, e para reiniciar ,apgaue os arquivos terraform.state, menos o iac.tf
+
+
+--------------------------------------
+
+terraform init 
+
+
+---------------------------
+
+terraform plan
+
+----------------------------------
+No sku name vamos deixar s1.
+
+--------------------------
+
+terraform apply.
+digite yes
+------------------------------------
+Agora vamos fazer o deploy pela azure tools mesmo.
+(NAO ESQUECA D EDESLOGAR DENOVO ) 
+
+faça login novamente 
+
+
+como professor mudou back 
+
+mudei no .env 
+VITE_BACKEND_URL=https://robot-make-mange.azurewebsites.net
+
+
+
+------------------------------------------
+Faça npm install novamente 
+
+npm run build
+
+-------------------------------
+va agora no azure tools, ache seu grupo de recurso , com botao direito selecione deploy web app, 
+
+
+va em browse na pagina que aparecer, e depois escolha pasta dist
+.
+
+
+Apois isso projeto ja esta rodando
+-------------
+
+para criarmos as partes de QA tstes precisamos implementar : 
+
+
+
+resource "azurerm_windows_web_app_slot" "vinicius-almeida-robot-t1-appQA" {
+  name = "vinicius-almeida-robot-appQA"
+  app_service_id = azurerm_windows_web_app.vinicius-almeida-robot-t1-app.id
+  site_config {
+     
+  }
+}
+
+----------------
+
+Agora no azure 
+
+va em implantacao 
+
+slots de implantacao 
+
+um é chamado de producao 
+e outro 
+
+qa.
+
+Veja que o qa parace ser um outro app.
+
+Opcao mais rapida va no azure tools, em deployment slots, no qa faça deploy slot
+
+
+Ou na aure vc tem o SWAP
+
+Source é a fonte 
+
+
+target alvo.
+
+dai vc faz o swap.
+
+-------------------------
+
+Vamos fazer no azure tools.
+vim no deployment botao direito no qa e deploy, depois só fazer o browse achar a dist e apertar em deploy pronto esta rodando.
+
+se voce fazer alteracao no codigo de : 
+npm run build 
+
+e faça o deploy, no ambiente de QA, para testar , dessta forma faz o deploy.
+-------------------------------
+
+
+Se estiver aprovada alteracao;
+
+Na azure slots de implantacao , faça o swap, 
+
+source é QA
+
+jogar para o target producao.
+
+---------------------------------------APRENDENDO PIPLINE
+
+para isso pesquise no recursos devops organization.
+
+------------------------------------------------------------------------
+
+pipline faz etapas, dentre elas é testar ,verificar funcionalidade ,depois disso o deploy.
+
+CID - peqsuisar . continuos improvments develops.
+
+
+--------------------------------------------------------------------------
+
+em azure devops organization 
+
+aperte em 
+my azure devops organizations
+
+https://dev.azure.com/andresavedrasenai/SENAI fomos adicionados a azure do professor acessadno este link.
+
+
+
+Vamos criar um projeto somente para o projeto publico no git.
+
+Esqueça que a terraform pasta criada no projeto anterior , apague a terra form , ou faça no gitignore.
+
+
+
+Azure devops ,serve para tanto criar pipelines, mas gerenciar tarefas a serem feitas no projeto.
+
+
+
+Vna services va em project sttings 
+
+em pipelines 
+
+service coonection.
+
+
+ A azure e a devops sao plataformas diferentes, desta forma para fazer a integração.
+
+
+Precisamos entrar na service connections, precisamos criar um service connections interligando as duas.
+
+Para isso va em new service connection 
+
+
+selecione Azure Resource Manager.
+
+
+Isso é interesante pois o devops pode comunicar com github , maven etc.
+
+
+Next aperte Workload primeira opcao .
+
+next 
+
+
+
+veja quee ele vai pegar a sbuscription, 
+
+clicando no resource group selecione o grupo de recursos.
+
+
+
+
+de um nome service connection name mange-bot-viniciusalmeida
+
+
+em security marque a opcao grant acess permission to all pipelines - permite que a conexao comunique com todas as pipelines que voce criar.
+
+((voce pode fazer pipeline com github,por exemplo))
+
+
+Clique e Repos
+
+em viniciusSenai parte superior cliqeu new reposiory , e clone URL coloque url do seu repositorio>
+
+
+Se estiver com repositorio privado , prcisa colocar requires Authentication 
+
+coloque seu username , em password 
+
+va no github settings , developer settings 
+personal acess tokens 
+generate new token (classic) 
+
+o token gerado coloque na password , pois nao é sua senha do git .
+
+Em repos tem todo seu repositiro.
+
+
+Agora vamos criar a pipelin 
+
+em piplines , 
+Create pipline
+
+Como o repositorio ja esta na azure repos selecion primeira opcao 
+coloque o azure que importou , 
+
+(Voce pode fazer no github ,precisa logar de novo).
+
+o tipo de projeto vamos selecionar node.js with vue 
+
+ira paracer um script , 
+
+
+trigger:
+- main   -- branch que vai rodar na pipeline, a minha principal é a main, mas se quiser mudar vc pode para outra.
+
+
+pool:
+  vmImage: ubuntu-latest   --- a ideia da pipeline é ser ubuntu , pois a pipeline tem vida de operacao mais rapida ubuntu sendo mais leve é melhor opcao.
+
+steps:  -passos da pipeline
+- task: NodeTool@0     -- como a maquina ubuntu virtual, nao tem node, pedmios que instale o node na versao 20.
+  inputs:
+    versionSpec: '20.x'
+  displayName: 'Install Node.js'
+
+- script: |    -- depois disso sao os comandos para rodar projeto, baixe bibliotecas e builda.
+    npm install
+    npm run build
+  displayName: 'npm install and build'
+
+
+Ainda nao finalizamos, mas da para fazer o save and run.
+
+
+
+Ira aparecer um commit message, nao no git, porem na azure=.
+
+commit
+
+
+Veja que ira aparecer o Job
+
+
+se voce apertar veja que ira aparecer o processo.
+
+
+(erro se voce criou sua propria org , precisamos ver outra etapa na proxima aula.)
+
+
+Neste caso ele com o script nao fez o deploy ainda, ele só deu comandos de pacotes.
+
+
+Na pepline va em edit e mude o script.
+
+
+
+Para fazermos o deploy, devemos gerar a pasta dist e zipar ela.
+
+
+Quando apertar em edit na aparaece a tasks aba, ou aperte show assittens,.
+
+
+Veja que tem ocpcao Archive files 
+
+Archive file to create apague e coloque dist.
+
+opcao replace existing archive tem que deixar habilitada.
+archive te zip.
+
+
+((Deixe selecionado na ultima linha para o codigo adicionado ir abaixo do codigo nao no meio.
+
+apo isso somente add.
+
+Veja que ira aparecer outro codigo para criar e compactar a dist.
+
+
+
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(Build.BinariesDirectory)'
+    includeRootFolder: true
+    archiveType: 'zip'
+    archiveFile: 'dist'
+    replaceExistingArchive: true
+
+
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: 'dist' --mude para dist
+    includeRootFolder: false -- aqui voce diz que nao quer pasta dist com arquivo, mas somente arquivo dist.
+    archiveType: 'zip'
+    archiveFile: 'dist.zip'  ---mude o nome arquivo
+    replaceExistingArchive: true 
+  displayName: "generating dist" -- aqui deve estar estanciando junto com task e nao com os filhos de inputs.
+
+Agora de validate and save
+
+
+
+Mas ainda sim precisamos pedir o deploy, para isso edite
+
+Azure Web App devemos selecionar agora na task 
+
+
+
+em azure subscriptioon coloque seu azure service , nao o subscription 
+
+app type é qual sistema voce colocou no caso é windows.s
+
+
+em app name é o nome dado .   MAs se voce quisesse mudar para a QA primeiro ,mude o deploy to slot or app service 
+para marcado , e selecione o recurso, 
+
+se estiver marcado por padrao , ele vai sempre mandar por prodcao..
+
+
+em package or folder 
+digite dist.zip
+
+
+additcional deployment options, pois a azure deixa fazer pelo zip ou pelo outro arquivo package, dessa forma 
+selecione zip deploy. é importante para ele nao tentar package, como nao esta preparado o codigo ira dar erro
+
+forcando a fazer no zip.
+
+
+de add
+
+
+ira aparecer 
+
+
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: 'mange-bot-viniciusalmeida'
+    appType: 'webApp'
+    appName: 'vinicius-almeida-robot-app'
+    package: 'dist.zip'
+    deploymentMethod: 'zipDeploy'
+
+
+Complemente com um nome: 
+
+
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: 'mange-bot-viniciusalmeida'
+    appType: 'webApp'
+    appName: 'vinicius-almeida-robot-app'
+    package: 'dist.zip'
+    deploymentMethod: 'zipDeploy'
+  displayName: "deployment" -- instancia task.
+
+
+
+
+
+
+
+
